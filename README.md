@@ -7,7 +7,7 @@
 
  
 
-To write a C program to implement the Playfair Substitution technique.
+To write a Python program to implement the Playfair Substitution technique.
 
 ## DESCRIPTION:
 
@@ -35,9 +35,84 @@ STEP-5: Display the obtained cipher text.
 
 
 Program:
+```
+def generate_key_table(key):
+    key = key.lower().replace('j', 'i')
+    table = []
+    used = set()
 
+    for ch in key:
+        if ch.isalpha() and ch not in used:
+            used.add(ch)
+            table.append(ch)
+
+    for ch in "abcdefghiklmnopqrstuvwxyz":
+        if ch not in used:
+            used.add(ch)
+            table.append(ch)
+
+    return [table[i:i+5] for i in range(0, 25, 5)]
+
+def prepare_text(text):
+    text = text.lower().replace(" ", "").replace("j", "i")
+    result = ""
+    i = 0
+    while i < len(text):
+        a = text[i]
+        if i + 1 < len(text):
+            b = text[i + 1]
+            if a == b:
+                result += a + "x"
+                i += 1
+            else:
+                result += a + b
+                i += 2
+        else:
+            result += a + "x"
+            i += 1
+    return result
+
+def encrypt(text, table):
+    pos = {}
+    for i in range(5):
+        for j in range(5):
+            pos[table[i][j]] = (i, j)
+
+    cipher = ""
+
+    for i in range(0, len(text), 2):
+        a, b = text[i], text[i + 1]
+        r1, c1 = pos[a]
+        r2, c2 = pos[b]
+
+        if r1 == r2:
+            cipher += table[r1][(c1 + 1) % 5]
+            cipher += table[r2][(c2 + 1) % 5]
+        elif c1 == c2:
+            cipher += table[(r1 + 1) % 5][c1]
+            cipher += table[(r2 + 1) % 5][c2]
+        else:
+            cipher += table[r1][c2]
+            cipher += table[r2][c1]
+
+    return cipher
+
+key = input("Enter the keyword: ")
+plaintext = input("Enter the plaintext: ")
+
+key_table = generate_key_table(key)
+prepared = prepare_text(plaintext)
+cipher = encrypt(prepared, key_table)
+
+print("\nKey Matrix:")
+for row in key_table:
+    print(" ".join(row))
+
+print("\nCipher Text:", cipher)
+```
 
 
 
 
 Output:
+<img width="1697" height="752" alt="image" src="https://github.com/user-attachments/assets/84a125cf-a288-42fa-b2ed-52935c437050" />
